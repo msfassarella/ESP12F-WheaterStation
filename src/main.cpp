@@ -18,7 +18,7 @@
 */
 //https://lastminuteengineers.com/esp8266-dht11-dht22-web-server-tutorial/
 //https://randomnerdtutorials.com/esp32-web-server-arduino-ide/
-//https://circuits4you.com/2016/12/16/esp8266-web-server-html/
+//https://circuits4you.com/2016/12/16/esp8266-web-server-html/3903000663
 //https://randomnerdtutorials.com/esp8266-web-server-spiffs-nodemcu/
 
 
@@ -39,7 +39,7 @@
 
 // network credentials
 const char* ssid = "GVT-34C0";
-const char* password = "3903000663";
+const char* password = "xxx";
 
 // Set web server port number to 80
 ESP8266WebServer  server(80);
