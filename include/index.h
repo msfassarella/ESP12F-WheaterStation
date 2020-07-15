@@ -4,6 +4,7 @@ String MAIN_page = R"=====(
 <!DOCTYPE html> <html>
     <head><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">  
       <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600" rel="stylesheet">  
+      <script src="https://code.highcharts.com/highcharts.js"></script>
      <title>ESP8266 Weather Report</title>  
      <style>
       * {
@@ -139,7 +140,7 @@ String MAIN_page = R"=====(
      </style>  
     
 	<script>  
-    setInterval(loadDoc,3000);  
+    setInterval(loadDoc,10000);  
     function loadDoc() {  
     var xhttp = new XMLHttpRequest();  
     xhttp.onreadystatechange = function() {  
@@ -195,55 +196,56 @@ String MAIN_page = R"=====(
            <th>Max</th>
          </tr>
          <tr>
-          <th>Dom, 11:30</th>
-          <th>20.1</th>
-          <th>25.2</th>
-          <th>28.3</th>
+          <th>Domingo</th>
+          <th>%MIN_D0%</th>
+          <th>%MED_D0%</th>
+          <th>%MAX_D0%</th>
         </tr>         
          <tr>
-          <th>Seg, 11:30</th>
-          <th>20.1</th>
-          <th>25.2</th>
-          <th>28.3</th>
+          <th>Segunda</th>
+          <th>%MIN_D1%</th>
+          <th>%MED_D1%</th>
+          <th>%MAX_D1%</th>
         </tr>
         <tr>
-          <th>Ter, 11:30</th>
-          <th>20.1</th>
-          <th>25.2</th>
-          <th>28.3</th>
+          <th>Terca</th>
+          <th>%MIN_D2%</th>
+          <th>%MED_D2%</th>
+          <th>%MAX_D2%</th>
         </tr>
          <tr>
-          <th>Qua, 11:30</th>
-          <th>20.1</th>
-          <th>25.2</th>
-          <th>28.3</th>
+          <th>Quarta</th>
+          <th>%MIN_D3%</th>
+          <th>%MED_D3%</th>
+          <th>%MAX_D3%</th>
         </tr>
         <tr>
-          <th>Qui, 11:30</th>
-          <th>20.1</th>
-          <th>25.2</th>
-          <th>28.3</th>
+          <th>Quinta</th>
+          <th>%MIN_D4%</th>
+          <th>%MED_D4%</th>
+          <th>%MAX_D4%</th>
         </tr>
         <tr>
-          <th>Sex, 11:30</th>
-          <th>20.1</th>
-          <th>25.2</th>
-          <th>28.3</th>
+          <th>Sexta</th>
+          <th>%MIN_D5%</th>
+          <th>%MED_D5%</th>
+          <th>%MAX_D5%</th>
         </tr>
         <tr>
-          <th>Sab, 11:30</th>
-          <th>20.1</th>
-          <th>25.2</th>
-          <th>28.3</th>
-        </tr>
-      </table>
+          <th>Sabado</th>
+          <th>%MIN_D6%</th>
+          <th>%MED_D6%</th>
+          <th>%MAX_D6%</th>
+       </tr>
+         
+       </table>
    </article>
    
    </section>
-  
+   <div id="chart-temperature" class="container"></div>
    </div>    
    </body>  
-</html>  
+</html>
 	 )=====";
 
 	
