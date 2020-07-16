@@ -18,7 +18,7 @@
 */
 //https://lastminuteengineers.com/esp8266-dht11-dht22-web-server-tutorial/
 //https://randomnerdtutorials.com/esp32-web-server-arduino-ide/
-//https://circuits4you.com/2016/12/16/esp8266-web-server-html/3903000663
+//https://circuits4you.com/2016/12/16/esp8266-web-server-html/
 //https://randomnerdtutorials.com/esp8266-web-server-spiffs-nodemcu/
 
 
@@ -33,20 +33,19 @@
 #include <WiFiUdp.h>
 #include "NTPClient.h"
 #include <ESP8266mDNS.h>
+#include "credentials.h"
+//#include <EEPROM.h>
 //#include "time.h"
 
 #define DHTTYPE DHT22   // DHT 22  (AM2302), AM2321
-
-// network credentials
-const char* ssid = "GVT-34C0";
-const char* password = "xxx";
 
 // Set web server port number to 80
 ESP8266WebServer  server(80);
 //AsyncWebServer  server(80);
 
 // Date & time with NTP
-const char* servidorNTP = "a.st1.ntp.br"; // Servidor NTP para pesquisar a hora
+//const char* servidorNTP = "a.st1.ntp.br"; // Servidor NTP para pesquisar a hora
+const char* servidorNTP = "200.160.7.186";
 const int fusoHorario = -10800;           // Fuso horário em segundos (-03h = -10800 seg)
 const int taxaDeAtualizacao = 1800000;    // Taxa de atualização do servidor NTP em milisegundos
 WiFiUDP ntpUDP;
@@ -91,6 +90,7 @@ float maxTempD3, minTempD3, medTempD3 = 0;
 float maxTempD4, minTempD4, medTempD4 = 0;
 float maxTempD5, minTempD5, medTempD5 = 0;
 float maxTempD6, minTempD6, medTempD6 = 0;
+int diaAtual = 0;                           // domingo = 0, segunda = 1, ..., sabado = 6
 
 //prototypes
 String SendHTML(float TempCstat,float Humiditystat);
@@ -130,10 +130,47 @@ float calcMedBufferTemp(void){
   return media;
 }
 */
+int restartWhenNewDay(int day, int calculatedDay){
+  if (day != calculatedDay) {
+    maxTemp = -200.0;
+    minTemp = +500.0;
+    medTemp = 0.0;
+  }
+  return (calculatedDay);
+}
+
+/**
+ * Description: return last valid temperature. 
+ *              If sensor has some problem and return is NAN, the valid temperature is the last one. 
+ * Input: last temperature
+ * Output: a valid temperature
+ */
+float getTemperature(float lastTemp){
+   float temp = dht.readTemperature();   // Gets the values of the temperature
+   if (isnan(temp)){
+     temp = lastTemp;
+   }
+   return temp;
+}
+
+/**
+ * Description: return last valid humidity. 
+ *              If sensor has some problem and return is NAN, the valid humidity is the last one. 
+ * Input: last humidity
+ * Output: a valid humidity
+ */
+float getHumidity(float lastHumidity){
+   float humidity = dht.readHumidity();   // Gets the values of the temperature
+   if (isnan(humidity)){
+     humidity = lastHumidity;
+   }
+   return humidity;
+}
+
 void handle_OnConnect() {
 
-  Temperature = dht.readTemperature(); // Gets the values of the temperature
-  Humidity = dht.readHumidity();       // Gets the values of the humidity 
+  Temperature = getTemperature(Temperature); // Gets the values of the temperature
+  Humidity = getHumidity(Humidity);          // Gets the values of the humidity 
   timeClient.update(); 
 
   //addBufferTemp(Temperature, BUFFER_TEMP_SIZE);
@@ -141,8 +178,11 @@ void handle_OnConnect() {
   minTemp = _min(Temperature,minTemp);
   medTemp = _max(minTemp,medTemp);
   medTemp = (maxTemp + minTemp + 7 * medTemp + Temperature)/10;
-  int dia = timeClient.getDay(); 
-
+  int diaCalculado = timeClient.getDay(); 
+  diaAtual = restartWhenNewDay(diaAtual,diaCalculado);
+  Serial.print("dia = ");
+  Serial.print(String(diaAtual));Serial.print(" ");
+  Serial.println(String(diaCalculado));
   printf("Temperatura %f\r\n", Temperature);
 
    String s = MAIN_page;
@@ -151,7 +191,7 @@ void handle_OnConnect() {
 
    s.replace("%HORA%",getDiaHora());
    
-   switch (dia){
+   switch (diaAtual){
      case 0:
          maxTempD0 = maxTemp;
          minTempD0 = minTemp;
@@ -243,7 +283,7 @@ String getDiaHora(void){
    int dia; // 0 -> domingo, 1 -> segunda, ... 7 -> sabado
    String diaehora;
    dia = timeClient.getDay();
-   //Serial.println(String(dia));
+   Serial.println(String(dia));
    switch(dia){
      case 0: diaehora = "Dom, "; break;
      case 1: diaehora = "Seg, "; break;
@@ -271,10 +311,13 @@ void setup() {
 
   dht.begin();
   // Connect to Wi-Fi network with SSID and password
+ 
+  loadCredentials();
   Serial.print("Connecting to ");
-  Serial.println(ssid);
+  Serial.print(ssidWifi); Serial.print(" "); Serial.println(passwordWifi); 
+  Serial.println(ssidWifi);
   WiFi.hostname("ambiente");
-  WiFi.begin(ssid, password);
+  WiFi.begin(ssidWifi, passwordWifi);
   MDNS.begin("ambiente");
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
