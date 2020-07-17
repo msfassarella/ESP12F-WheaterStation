@@ -45,7 +45,7 @@ ESP8266WebServer  server(80);
 
 // Date & time with NTP
 //const char* servidorNTP = "a.st1.ntp.br"; // Servidor NTP para pesquisar a hora
-const char* servidorNTP = "200.160.7.186";
+const char* servidorNTP = "br.pool.ntp.org";
 const int fusoHorario = -10800;           // Fuso horário em segundos (-03h = -10800 seg)
 const int taxaDeAtualizacao = 1800000;    // Taxa de atualização do servidor NTP em milisegundos
 WiFiUDP ntpUDP;
@@ -91,6 +91,8 @@ float maxTempD4, minTempD4, medTempD4 = 0;
 float maxTempD5, minTempD5, medTempD5 = 0;
 float maxTempD6, minTempD6, medTempD6 = 0;
 int diaAtual = 0;                           // domingo = 0, segunda = 1, ..., sabado = 6
+
+bool wifiFound = false;
 
 //prototypes
 String SendHTML(float TempCstat,float Humiditystat);
@@ -171,7 +173,7 @@ void handle_OnConnect() {
 
   Temperature = getTemperature(Temperature); // Gets the values of the temperature
   Humidity = getHumidity(Humidity);          // Gets the values of the humidity 
-  timeClient.update(); 
+  //timeClient.update(); 
 
   //addBufferTemp(Temperature, BUFFER_TEMP_SIZE);
   maxTemp = _max(Temperature,maxTemp);
@@ -267,6 +269,49 @@ void handle_NotFound(){
   server.send(404, "text/html", nofo);
 }
 
+
+/**
+ * brief: Look for a specific wifi ssid
+*/
+bool lookForWifi(String ssid2Locate){
+
+     const unsigned int SCAN_WAIT_TIME = 5000;
+     static unsigned long scanTimePast = 0;
+     unsigned long timeNow;
+     bool wififound = false;
+
+     timeNow = millis();
+    //printf("timepast %lu timenow %lu ",scanTimePast, timeNow);
+    if (timeNow - scanTimePast  >= SCAN_WAIT_TIME){
+         int n = WiFi.scanNetworks();
+         Serial.print("\r\nscan done: ");
+         if (n == 0) {
+            Serial.println("no networks found");
+         } else {
+             Serial.print(n);
+             Serial.println(" networks found");
+             for (int i = 0; i < n; ++i) {
+            // Print SSID and RSSI for each network found
+                if (ssid2Locate.equals(WiFi.SSID(i))){
+                  Serial.println("rede encontrada");
+                  wififound = true;
+                  break;
+                }
+                Serial.print(i + 1);
+                Serial.print(": ");
+                Serial.print(WiFi.SSID(i));
+                Serial.print(" (");
+                Serial.print(WiFi.RSSI(i));
+                Serial.print(")");
+                Serial.println((WiFi.encryptionType(i) == ENC_TYPE_NONE) ? " " : "*");
+                  delay(5);
+                }
+         }
+         scanTimePast = timeNow;
+    }
+    return wififound;
+}
+
 /*
 void handle_temperatura() {
   String s = Grafico_page;
@@ -298,8 +343,11 @@ String getDiaHora(void){
    //Serial.println(diaehora);
    return diaehora;
 }
+
+
 // arduino
 void setup() {
+
   Serial.begin(115200);
   // Initialize the output variables as outputs
   pinMode(output26, OUTPUT);
@@ -313,6 +361,17 @@ void setup() {
   // Connect to Wi-Fi network with SSID and password
  
   loadCredentials();
+  Serial.print(String(ssidWifi));
+  for (unsigned int i =0; i< 30; i++){
+     wifiFound = lookForWifi(String(ssidWifi));
+     if (wifiFound){
+       break;
+     }
+     delay(5000);
+  } 
+
+wifiFound = false; // teste apenas
+  if (wifiFound){
   Serial.print("Connecting to ");
   Serial.print(ssidWifi); Serial.print(" "); Serial.println(passwordWifi); 
   Serial.println(ssidWifi);
@@ -339,13 +398,22 @@ void setup() {
   Serial.println("HTTP server started");
 
   timeClient.begin();
+  }
+  else{
+    WiFi.softAP("ESP_Inventus", "inventus");
+    
+  }
 }
 
 void loop() {
-  server.handleClient();
-  timeClient.update();
-  Serial.println(timeClient.getFormattedTime());
- 
+  if (wifiFound){
+     server.handleClient();
+     timeClient.update();
+     Serial.println(timeClient.getFormattedTime());
+  }
+  else{
+    Serial.printf("Stations connected = %d\n", WiFi.softAPgetStationNum());
+  }
   delay(1000);
 }
 
