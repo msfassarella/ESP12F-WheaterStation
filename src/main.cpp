@@ -401,7 +401,11 @@ wifiFound = false; // teste apenas
   }
   else{
     WiFi.softAP("ESP_Inventus", "inventus");
-    
+    Serial.print("AP IP address: ");
+    IPAddress myIP = WiFi.softAPIP();
+    Serial.println(myIP);
+    server.on("/", handle_OnConnect);
+    server.begin();
   }
 }
 
@@ -413,6 +417,7 @@ void loop() {
   }
   else{
     Serial.printf("Stations connected = %d\n", WiFi.softAPgetStationNum());
+   server.handleClient();
   }
   delay(1000);
 }
