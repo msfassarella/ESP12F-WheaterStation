@@ -416,7 +416,7 @@ void loop() {
      Serial.println(timeClient.getFormattedTime());
   }
   else{
-    Serial.printf("Stations connected = %d\n", WiFi.softAPgetStationNum());
+   // Serial.printf("Stations connected = %d\n", WiFi.softAPgetStationNum());
    server.handleClient();
   }
   delay(1000);
