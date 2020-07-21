@@ -28,6 +28,8 @@
 //#include "ESPAsyncWebServer.h"
 #include "index.h"
 #include "notfoundpage.h"
+#include "configwifipage.h"
+
 #include "temperature.h"
 #include "DHT.h"
 #include <WiFiUdp.h>
@@ -269,6 +271,46 @@ void handle_NotFound(){
   server.send(404, "text/html", nofo);
 }
 
+void handle_getWifiData() {
+  String confwifi = Config_Wifi_Page;
+  server.send(404, "text/html", confwifi);
+}
+
+void handle_getfunction() {
+ String message = "Number of args received:";
+ String config_wifi_pw = Config_Wifi_PW_Page;
+ String wifiParameter = "wifiName";
+  message += server.args();            //Get number of parameters
+  message += "\n";                            //Add a new line
+
+  Serial.print("argumentos: ");
+  Serial.println(server.args());
+  for (int i = 0; i < server.args(); i++) {
+     message += "Arg nº" + (String)i + " –> ";   //Include the current iteration value
+     message += server.argName(i) + ": ";     //Get the name of the parameter
+     message += server.arg(i) + "\n";              //Get the value of the parameter
+  } 
+ Serial.println(message);
+ //server.send(200, "text/plain", "Body not received");
+ //server.send(200, "text/html", config_wifi_pw);
+
+ //if (wifiParameter.equals(server.argName(0)) ){      // wifiName
+ if (server.argName(0) == "wifiName"){
+    server.send(200, "text/html", config_wifi_pw);
+    wifiParameter = "wifiPassword";
+ }
+ else{
+    Serial.print("arg0 = ");
+    Serial.println(server.argName(0));
+    //if (wifiParameter.equals(server.argName(0)) ){   // wifiPW
+    if (server.argName(0) == "wifiPassword"){
+        server.send(200, "text/plain", "SUCESS");
+    }
+    else{
+      server.send(200, "text/plain", "Error");
+    }
+ }
+}
 
 /**
  * brief: Look for a specific wifi ssid
@@ -404,7 +446,10 @@ wifiFound = false; // teste apenas
     Serial.print("AP IP address: ");
     IPAddress myIP = WiFi.softAPIP();
     Serial.println(myIP);
-    server.on("/", handle_OnConnect);
+    //server.on("/", handle_OnConnect);
+    server.on("/", handle_getWifiData);
+    server.on("/get", HTTP_GET, handle_getfunction);
+
     server.begin();
   }
 }

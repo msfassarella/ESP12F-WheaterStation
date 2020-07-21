@@ -1,23 +1,29 @@
 #include "Arduino.h"
 
-String CONFIGWIFI_PAGE = R"=====(
+String Config_Wifi_Page = R"=====(
 <!DOCTYPE HTML><html><head>
   <title>ESP Input Form</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   </head>
   <body>
   <form action="/get">
-    input1: <input type="text" name="input1">
-    <input type="submit" value="Submit">
+    Wifi <input type="text" name="wifiName">
+    <input type="Submit" value="Next">
   </form><br>
+</body>
+</html>
+	 )=====";
+
+String Config_Wifi_PW_Page = R"=====(
+<!DOCTYPE HTML><html><head>
+  <title>ESP Input Form</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
   <form action="/get">
-    input2: <input type="text" name="input2">
-    <input type="submit" value="Submit">
+    Password <input type="text" name="wifiPassword">
+    <input type="Submit" value="Send">
   </form><br>
-  <form action="/get">
-    input3: <input type="text" name="input3">
-    <input type="submit" value="Submit">
-  </form>
 </body>
 </html>
 	 )=====";
