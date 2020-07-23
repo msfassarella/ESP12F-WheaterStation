@@ -28,6 +28,8 @@
 //#include "ESPAsyncWebServer.h"
 #include "index.h"
 #include "notfoundpage.h"
+#include "configwifipage.h"
+
 #include "temperature.h"
 #include "DHT.h"
 #include <WiFiUdp.h>
@@ -269,6 +271,55 @@ void handle_NotFound(){
   server.send(404, "text/html", nofo);
 }
 
+void handle_getWifiData() {
+  String confwifi = Config_Wifi_Page;          //The page to configure Wifi name
+  server.send(404, "text/html", confwifi);
+}
+
+void handle_getfunction() {
+ String message = "Number of args received:";
+ String config_wifi_pw = Config_Wifi_PW_Page;    //The page to configure Wifi password
+ String wifiParameter = "wifiName";              //String received from webpage to indicate the type of the data
+ String config_wifi_sucess = Config_Wifi_Sucess; //The sucess page
+ String config_wifi_erro = Config_Wifi_Erro;     //The erro page
+
+ message += server.args();                       //Get number of parameters
+ message += "\n";                                //Add a new line
+
+ for (int i = 0; i < server.args(); i++) {
+    message += "Arg nº" + (String)i + " –> ";    //Include the current iteration value
+    message += server.argName(i) + ": ";         //Get the name of the parameter
+    message += server.arg(i) + "\n";             //Get the value of the parameter
+ } 
+ Serial.println(message);
+ //server.send(200, "text/plain", "Body not received");
+ //server.send(200, "text/html", config_wifi_pw);
+
+ //if (wifiParameter.equals(server.argName(0)) ){      // wifiName
+ if (server.argName(0) == "wifiName"){
+    server.send(200, "text/html", config_wifi_pw);
+    String aux =  String(server.arg(0));
+    aux.toCharArray(ssidWifi, aux.length() + 1);
+    Serial.print("ssid: "); Serial.println(ssidWifi);
+    wifiParameter = "wifiPassword";                   //Reconfigure to next page
+ }
+ else{
+    Serial.print("arg0 = ");
+    Serial.println(server.argName(0));
+    //if (wifiParameter.equals(server.argName(0)) ){   // wifiPW
+    if (server.argName(0) == "wifiPassword"){
+        String aux =  String(server.arg(0));
+        aux.toCharArray(passwordWifi, aux.length() + 1);
+        Serial.print("pw: "); Serial.println(passwordWifi);
+        saveCredentials();
+        server.send(200, "text/html",config_wifi_sucess);
+    }
+    else{
+      server.send(200, "text/html",config_wifi_erro);
+      //server.send(200, "text/plain", "Error");
+    }
+ }
+}
 
 /**
  * brief: Look for a specific wifi ssid
@@ -362,7 +413,7 @@ void setup() {
  
   loadCredentials();
   Serial.print(String(ssidWifi));
-  for (unsigned int i =0; i< 30; i++){
+  for (unsigned int i =0; i< 10; i++){
      wifiFound = lookForWifi(String(ssidWifi));
      if (wifiFound){
        break;
@@ -370,7 +421,7 @@ void setup() {
      delay(5000);
   } 
 
-wifiFound = false; // teste apenas
+//wifiFound = false; // teste apenas
   if (wifiFound){
   Serial.print("Connecting to ");
   Serial.print(ssidWifi); Serial.print(" "); Serial.println(passwordWifi); 
@@ -404,7 +455,10 @@ wifiFound = false; // teste apenas
     Serial.print("AP IP address: ");
     IPAddress myIP = WiFi.softAPIP();
     Serial.println(myIP);
-    server.on("/", handle_OnConnect);
+    //server.on("/", handle_OnConnect);
+    server.on("/", handle_getWifiData);
+    server.on("/get", HTTP_GET, handle_getfunction);
+
     server.begin();
   }
 }
@@ -416,7 +470,7 @@ void loop() {
      Serial.println(timeClient.getFormattedTime());
   }
   else{
-    Serial.printf("Stations connected = %d\n", WiFi.softAPgetStationNum());
+   // Serial.printf("Stations connected = %d\n", WiFi.softAPgetStationNum());
    server.handleClient();
   }
   delay(1000);
