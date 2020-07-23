@@ -6,3 +6,4 @@ This time is sincronized with a NTP server.
 A log of maximum, minimum and medium temperature of an entire week is stored in a table in the main page.
 
 
+test
