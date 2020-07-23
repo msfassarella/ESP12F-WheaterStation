@@ -21,7 +21,7 @@ Table example:
 When the device start it looks for a known WiFi network and if it isn't avaiable a server will be opened. 
 The server name will be **ESP_Inventus** and the pass phrase is **inventus**.
 After connect in this server, you will be able to change the local network parameters. Once it is done with **sucess** restart your device. 
-You can connect in your device using the url **http:\ \ambiente** to see the main page.
+You can connect in your device using the url **http://ambiente/** to see the main page (if it not work, restart your router).
 
 ![APP Responsive](doc/app.png)
 
