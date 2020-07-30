@@ -9,3 +9,9 @@ in the development cycle.
 
 More information about PIO Unit Testing:
 - https://docs.platformio.org/page/plus/unit-testing.html
+
+
+// Problema de dois devices na mesma rede usando o mesmo nome de host
+-> Uma das maneiras de resolver é deixando o usuario configurar no inicio
+-> Criar uma página para que esse nome seja configurado.
+-> 

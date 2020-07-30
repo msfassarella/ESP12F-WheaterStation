@@ -140,7 +140,7 @@ String MAIN_page = R"=====(
      </style>  
     
 	<script>  
-    setInterval(loadDoc,10000);  
+    setInterval(loadDoc,15000);  
     function loadDoc() {  
     var xhttp = new XMLHttpRequest();  
     xhttp.onreadystatechange = function() {  
@@ -157,8 +157,7 @@ String MAIN_page = R"=====(
     
       <div id="webpage">  
      
-      <h1>Meu Ambiente</h1>  
-      <p>%HORA%</p>
+      <h2>My Environment - %HORA%</h2>  
       <section>
       <nav>
       <div class="data">  
@@ -172,7 +171,7 @@ String MAIN_page = R"=====(
           c0.013-3.44,0-6.881,0.007-10.322C2.674,1.634,2.974,0.955,3.498,0.53z"/>  
           </svg>  
         </div>  
-        <div class="side-by-side temperature-text">Temperatura</div>  
+        <div class="side-by-side temperature-text">Temperature</div>  
         <div class="side-by-side temperature">%TEMP%<span class="superscript">&deg C</span></div>  
       </div>  
      
@@ -183,56 +182,56 @@ String MAIN_page = R"=====(
          c-0.438,1.574-2.264,4.681-6.252,4.681c-3.988,0-5.813-3.107-6.252-4.681C-0.313,11.267,0.026,9.143,1.819,6.217"></path>  
          </svg>  
        </div>  
-       <div class="side-by-side humidity-text">Umidade</div>  
+       <div class="side-by-side humidity-text">Humidity</div>  
        <div class="side-by-side humidity">%HUMI%<span class="superscript">%</span></div>  
       </div>
    </nav>
    <article>
       <table>
          <tr>
-           <th>Data-Hora</th>
+           <th>Week Day</th>
            <th>Min</th>
            <th>Med</th>
            <th>Max</th>
          </tr>
          <tr>
-          <th>Domingo</th>
+          <th>Sunday</th>
           <th>%MIN_D0%</th>
           <th>%MED_D0%</th>
           <th>%MAX_D0%</th>
         </tr>         
          <tr>
-          <th>Segunda</th>
+          <th>Monday</th>
           <th>%MIN_D1%</th>
           <th>%MED_D1%</th>
           <th>%MAX_D1%</th>
         </tr>
         <tr>
-          <th>Terca</th>
+          <th>Tuesday</th>
           <th>%MIN_D2%</th>
           <th>%MED_D2%</th>
           <th>%MAX_D2%</th>
         </tr>
          <tr>
-          <th>Quarta</th>
+          <th>Wednesday</th>
           <th>%MIN_D3%</th>
           <th>%MED_D3%</th>
           <th>%MAX_D3%</th>
         </tr>
         <tr>
-          <th>Quinta</th>
+          <th>Thursday</th>
           <th>%MIN_D4%</th>
           <th>%MED_D4%</th>
           <th>%MAX_D4%</th>
         </tr>
         <tr>
-          <th>Sexta</th>
+          <th>Friday</th>
           <th>%MIN_D5%</th>
           <th>%MED_D5%</th>
           <th>%MAX_D5%</th>
         </tr>
         <tr>
-          <th>Sabado</th>
+          <th>Saturday</th>
           <th>%MIN_D6%</th>
           <th>%MED_D6%</th>
           <th>%MAX_D6%</th>

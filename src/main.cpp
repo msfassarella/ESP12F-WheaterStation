@@ -25,6 +25,12 @@
 #include <Arduino.h>
 #include <esp8266wifi.h>
 #include <ESP8266WebServer.h>
+//https://electrosome.com/updating-sensor-data-google-spreadsheet-esp8266-iot-project/
+//#include <WiFiClientSecure.h> //esp32
+//#include <HTTPClient.h>   // Kazushi Mukaiyama
+//https://github.com/StorageB/Google-Sheets-Logging
+//#include "HTTPSRedirect.h"
+
 //#include "ESPAsyncWebServer.h"
 #include "index.h"
 #include "notfoundpage.h"
@@ -95,6 +101,21 @@ float maxTempD6, minTempD6, medTempD6 = 0;
 int diaAtual = 0;                           // domingo = 0, segunda = 1, ..., sabado = 6
 
 bool wifiFound = false;
+
+//postar no spreadsheet
+//const char* host = "script.google.com"; 
+//String url;
+//WiFiClientSecure client;
+//const int httpPort = 443;
+/*
+const char *GScriptId = "AKfycbyIQWuqm7mgdFAMMsabeD49M2dAHtk3X8rBXPjLwzg";
+const char* host = "script.google.com";
+const int httpsPort = 443;
+const char* fingerprint = "";
+String url = String("/macros/s/") + GScriptId + "/exec?cal";
+
+HTTPSRedirect* client = nullptr;
+*/
 
 //prototypes
 String SendHTML(float TempCstat,float Humiditystat);
@@ -263,7 +284,61 @@ void handle_OnConnect() {
 
    server.send(200, "text/html", s);
    
+
    
+   // Salvando dados na planilha do google
+   //https://script.google.com/macros/s/AKfycbyIQWuqm7mgdFAMMsabeD49M2dAHtk3X8rBXPjLwzg/dev?func=addData&val=10
+   /*
+   client.setInsecure();
+   
+   if (client.connected() == false){
+     if (!client.connect(host, httpPort)) 
+     {
+       Serial.println("connection failed");
+       return;
+     }
+     Serial.println("connection spreadsheet ok");
+   }
+/*
+   url = "/macros/s/AKfycbxEPussHF2Qw-7jEqbibMaf6Z1f8rRzytEigo9Or9pETmYzPU0/exec?func=addData&val="+ String(Temperature);
+   Serial.print("Requesting URL: ");
+   Serial.println(url);
+   client.print(String("GET ") + url + " HTTP/1.1\r\n" +
+               "Host: " + host + "\r\n" + 
+               "Connection: close\r\n\r\n");
+  delay(500);
+  String section="header";
+  while(client.available())
+  {
+    String line = client.readStringUntil('\r');
+    Serial.print(line);
+  }
+  */
+/*
+      HTTPClient http;
+
+      String serverPath = "https://script.google.com/macros/s/AKfycbyIQWuqm7mgdFAMMsabeD49M2dAHtk3X8rBXPjLwzg/dev?func=addData&val=10.5";
+      
+      // Your Domain name with URL path or IP address with path
+      http.begin(serverPath.c_str());
+      
+      // Send HTTP GET request
+      int httpResponseCode = http.GET();
+      
+      if (httpResponseCode>0) {
+        Serial.print("HTTP Response code: ");
+        Serial.println(httpResponseCode);
+        String payload = http.getString();
+        Serial.println(payload);
+      }
+      else {
+        Serial.print("Error code: ");
+        Serial.println(httpResponseCode);
+      }
+      
+  Serial.println();
+  Serial.println("closing connection");
+  */
 }
 
 void handle_NotFound(){
@@ -413,11 +488,13 @@ void setup() {
  
   loadCredentials();
   Serial.print(String(ssidWifi));
-  for (unsigned int i =0; i< 10; i++){
+  for (unsigned int i =0; i< 5; i++){
      wifiFound = lookForWifi(String(ssidWifi));
      if (wifiFound){
        break;
      }
+     Serial.print("loop: "); 
+     Serial.println(i);
      delay(5000);
   } 
 
@@ -449,6 +526,46 @@ void setup() {
   Serial.println("HTTP server started");
 
   timeClient.begin();
+
+
+////////////
+    // teste spreadsheet
+     // Use HTTPSRedirect class to create a new TLS connection
+     /*
+  client = new HTTPSRedirect(httpsPort);
+  client->setInsecure();
+  client->setPrintResponseBody(true);
+  client->setContentTypeHeader("application/json");
+  
+  Serial.print("Connecting to ");
+  Serial.println(host);
+
+  // Try to connect for a maximum of 5 times
+  bool flag = false;
+  for (int i=0; i<5; i++){
+    int retval = client->connect(host, httpsPort);
+    if (retval == 1) {
+       flag = true;
+       Serial.println("Connected");
+       break;
+    }
+    else
+      Serial.println("Connection failed. Retrying...");
+      delay(500);
+  }
+
+  if (!flag){
+    Serial.print("Could not connect to server: ");
+    Serial.println(host);
+    return;
+  }
+
+  // delete HTTPSRedirect object
+  delete client;
+  client = nullptr;
+*/
+/////////////
+
   }
   else{
     WiFi.softAP("ESP_Inventus", "inventus");
@@ -468,6 +585,18 @@ void loop() {
      server.handleClient();
      timeClient.update();
      Serial.println(timeClient.getFormattedTime());
+     Temperature = getTemperature(Temperature); // Gets the values of the temperature
+     maxTemp = _max(Temperature,maxTemp);
+     minTemp = _min(Temperature,minTemp);
+     medTemp = _max(minTemp,medTemp);
+     medTemp = (maxTemp + minTemp + 7 * medTemp + Temperature)/10;
+     int diaCalculado = timeClient.getDay(); 
+     diaAtual = restartWhenNewDay(diaAtual,diaCalculado);
+     Serial.print("day, time, tnow, tmin, tmed, tmax,");
+     Serial.printf("%d, ",diaAtual);
+     Serial.print(timeClient.getFormattedTime());
+     printf(", %f, %f, %f, %f\r\n", Temperature, minTemp, medTemp, maxTemp);
+
   }
   else{
    // Serial.printf("Stations connected = %d\n", WiFi.softAPgetStationNum());
