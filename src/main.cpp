@@ -20,16 +20,17 @@
 //https://randomnerdtutorials.com/esp32-web-server-arduino-ide/
 //https://circuits4you.com/2016/12/16/esp8266-web-server-html/
 //https://randomnerdtutorials.com/esp8266-web-server-spiffs-nodemcu/
-
-
-#include <Arduino.h>
-#include <esp8266wifi.h>
-#include <ESP8266WebServer.h>
 //https://electrosome.com/updating-sensor-data-google-spreadsheet-esp8266-iot-project/
 //#include <WiFiClientSecure.h> //esp32
 //#include <HTTPClient.h>   // Kazushi Mukaiyama
 //https://github.com/StorageB/Google-Sheets-Logging
 //#include "HTTPSRedirect.h"
+
+
+
+#include <Arduino.h>
+#include <esp8266wifi.h>
+#include <ESP8266WebServer.h>
 
 //#include "ESPAsyncWebServer.h"
 #include "index.h"
@@ -102,21 +103,6 @@ int diaAtual = 0;                           // domingo = 0, segunda = 1, ..., sa
 
 bool wifiFound = false;
 
-//postar no spreadsheet
-//const char* host = "script.google.com"; 
-//String url;
-//WiFiClientSecure client;
-//const int httpPort = 443;
-/*
-const char *GScriptId = "AKfycbyIQWuqm7mgdFAMMsabeD49M2dAHtk3X8rBXPjLwzg";
-const char* host = "script.google.com";
-const int httpsPort = 443;
-const char* fingerprint = "";
-String url = String("/macros/s/") + GScriptId + "/exec?cal";
-
-HTTPSRedirect* client = nullptr;
-*/
-
 //prototypes
 String SendHTML(float TempCstat,float Humiditystat);
 void handle_OnConnect();
@@ -126,35 +112,7 @@ String getDiaHora(void);
 // functions
 // Initialize DHT sensor.
 DHT dht(dhtpin, DHTTYPE);                
-/*
-void addBufferTemp(float valor, int buffer_size){
-  if (pnext < buffer_size){
-    tempBuf[pnext] = valor;
-    pnext++;
-     if (pnext >= buffer_size) 
-       pnext = 0;  
 
-     if (qnt_preenchida < buffer_size){
-      qnt_preenchida++;
-     }
-  }
-  else{
-    pnext = 0;    
-    qnt_preenchida = 0;
-  }
-}
-
-float calcMedBufferTemp(void){
-  float media = 0;
-  for (int i =0; i<pnext; i++){
-     media += tempBuf[pnext];
-  }
-  if (qnt_preenchida > 0){
-    media = media / qnt_preenchida ;
-  }
-  return media;
-}
-*/
 int restartWhenNewDay(int day, int calculatedDay){
   if (day != calculatedDay) {
     maxTemp = -200.0;
@@ -196,9 +154,7 @@ void handle_OnConnect() {
 
   Temperature = getTemperature(Temperature); // Gets the values of the temperature
   Humidity = getHumidity(Humidity);          // Gets the values of the humidity 
-  //timeClient.update(); 
 
-  //addBufferTemp(Temperature, BUFFER_TEMP_SIZE);
   maxTemp = _max(Temperature,maxTemp);
   minTemp = _min(Temperature,minTemp);
   medTemp = _max(minTemp,medTemp);
@@ -283,62 +239,6 @@ void handle_OnConnect() {
    s.replace("%MED_D6%", String(medTempD6));
 
    server.send(200, "text/html", s);
-   
-
-   
-   // Salvando dados na planilha do google
-   //https://script.google.com/macros/s/AKfycbyIQWuqm7mgdFAMMsabeD49M2dAHtk3X8rBXPjLwzg/dev?func=addData&val=10
-   /*
-   client.setInsecure();
-   
-   if (client.connected() == false){
-     if (!client.connect(host, httpPort)) 
-     {
-       Serial.println("connection failed");
-       return;
-     }
-     Serial.println("connection spreadsheet ok");
-   }
-/*
-   url = "/macros/s/AKfycbxEPussHF2Qw-7jEqbibMaf6Z1f8rRzytEigo9Or9pETmYzPU0/exec?func=addData&val="+ String(Temperature);
-   Serial.print("Requesting URL: ");
-   Serial.println(url);
-   client.print(String("GET ") + url + " HTTP/1.1\r\n" +
-               "Host: " + host + "\r\n" + 
-               "Connection: close\r\n\r\n");
-  delay(500);
-  String section="header";
-  while(client.available())
-  {
-    String line = client.readStringUntil('\r');
-    Serial.print(line);
-  }
-  */
-/*
-      HTTPClient http;
-
-      String serverPath = "https://script.google.com/macros/s/AKfycbyIQWuqm7mgdFAMMsabeD49M2dAHtk3X8rBXPjLwzg/dev?func=addData&val=10.5";
-      
-      // Your Domain name with URL path or IP address with path
-      http.begin(serverPath.c_str());
-      
-      // Send HTTP GET request
-      int httpResponseCode = http.GET();
-      
-      if (httpResponseCode>0) {
-        Serial.print("HTTP Response code: ");
-        Serial.println(httpResponseCode);
-        String payload = http.getString();
-        Serial.println(payload);
-      }
-      else {
-        Serial.print("Error code: ");
-        Serial.println(httpResponseCode);
-      }
-      
-  Serial.println();
-  Serial.println("closing connection");
-  */
 }
 
 void handle_NotFound(){
@@ -368,7 +268,6 @@ void handle_getfunction() {
  } 
  Serial.println(message);
  //server.send(200, "text/plain", "Body not received");
- //server.send(200, "text/html", config_wifi_pw);
 
  //if (wifiParameter.equals(server.argName(0)) ){      // wifiName
  if (server.argName(0) == "wifiName"){
@@ -381,7 +280,6 @@ void handle_getfunction() {
  else{
     Serial.print("arg0 = ");
     Serial.println(server.argName(0));
-    //if (wifiParameter.equals(server.argName(0)) ){   // wifiPW
     if (server.argName(0) == "wifiPassword"){
         String aux =  String(server.arg(0));
         aux.toCharArray(passwordWifi, aux.length() + 1);
@@ -391,7 +289,6 @@ void handle_getfunction() {
     }
     else{
       server.send(200, "text/html",config_wifi_erro);
-      //server.send(200, "text/plain", "Error");
     }
  }
 }
@@ -437,17 +334,6 @@ bool lookForWifi(String ssid2Locate){
     }
     return wififound;
 }
-
-/*
-void handle_temperatura() {
-  String s = Grafico_page;
-  Temperature = dht.readTemperature(); // Gets the values of the temperature
-  String strTemperatura = String(Temperature);
-  //server.send(200, "text/html", s);
-  Serial.println("lendo temp");
-  server.send_P(200,"text/plain",strTemperatura.c_str());
-}
-*/
 
 // processa dia e hora
 String getDiaHora(void){
@@ -518,9 +404,7 @@ void setup() {
   Serial.println(WiFi.hostname());
 
   server.on("/", handle_OnConnect);
-  //Server.on(“/page1”,First_page); //”192.168.2.2/page1”  this is first page location
-  //server.on("/temperatura", handle_temperatura);
- 
+
   server.onNotFound(handle_NotFound);
   server.begin();
   Serial.println("HTTP server started");
@@ -528,43 +412,6 @@ void setup() {
   timeClient.begin();
 
 
-////////////
-    // teste spreadsheet
-     // Use HTTPSRedirect class to create a new TLS connection
-     /*
-  client = new HTTPSRedirect(httpsPort);
-  client->setInsecure();
-  client->setPrintResponseBody(true);
-  client->setContentTypeHeader("application/json");
-  
-  Serial.print("Connecting to ");
-  Serial.println(host);
-
-  // Try to connect for a maximum of 5 times
-  bool flag = false;
-  for (int i=0; i<5; i++){
-    int retval = client->connect(host, httpsPort);
-    if (retval == 1) {
-       flag = true;
-       Serial.println("Connected");
-       break;
-    }
-    else
-      Serial.println("Connection failed. Retrying...");
-      delay(500);
-  }
-
-  if (!flag){
-    Serial.print("Could not connect to server: ");
-    Serial.println(host);
-    return;
-  }
-
-  // delete HTTPSRedirect object
-  delete client;
-  client = nullptr;
-*/
-/////////////
 
   }
   else{
@@ -584,7 +431,6 @@ void loop() {
   if (wifiFound){
      server.handleClient();
      timeClient.update();
-     Serial.println(timeClient.getFormattedTime());
      Temperature = getTemperature(Temperature); // Gets the values of the temperature
      maxTemp = _max(Temperature,maxTemp);
      minTemp = _min(Temperature,minTemp);
@@ -593,7 +439,7 @@ void loop() {
      int diaCalculado = timeClient.getDay(); 
      diaAtual = restartWhenNewDay(diaAtual,diaCalculado);
      Serial.print("day, time, tnow, tmin, tmed, tmax,");
-     Serial.printf("%d, ",diaAtual);
+     Serial.printf(" %d, ",diaAtual);
      Serial.print(timeClient.getFormattedTime());
      printf(", %f, %f, %f, %f\r\n", Temperature, minTemp, medTemp, maxTemp);
 
