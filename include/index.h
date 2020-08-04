@@ -157,7 +157,8 @@ String MAIN_page = R"=====(
     
       <div id="webpage">  
      
-      <h2>My Environment - %HORA%</h2>  
+      <h2>%SERVERNAME% - %HORA%</h2>  
+      <h4>%MYIP%</h4>
       <section>
       <nav>
       <div class="data">  

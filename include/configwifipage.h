@@ -7,22 +7,27 @@ String Config_Wifi_Page = R"=====(
   </head>
   <body>
   <form action="/get">
-    Wifi <input type="text" name="wifiName">
-    <input type="Submit" value="Next">
+    <br> 
+    <label>WiFi</label><br>
+    <input type="text" name="wifiName"> <br>
+    <label>PW</label><br>
+    <input type="text" name="wifiPW"><br>
+    <p> <input type="Submit" value="Next"></p>
   </form><br>
 </body>
 </html>
 	 )=====";
 
-String Config_Wifi_PW_Page = R"=====(
+String Config_Server_Name_Page = R"=====(
 <!DOCTYPE HTML><html><head>
   <title>ESP Input Form</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   </head>
   <body>
   <form action="/get">
-    Password <input type="text" name="wifiPassword">
-    <input type="Submit" value="Send">
+    <label>Nome do Local</label><br>
+    <input type="text" name="serverName">
+    <p><input type="Submit" value="Send"></p>
   </form><br>
 </body>
 </html>

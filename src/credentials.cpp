@@ -10,8 +10,9 @@ void loadCredentials() {
   EEPROM.begin(512);
   EEPROM.get(0, ssidWifi);
   EEPROM.get(0+sizeof(ssidWifi), passwordWifi);
+  EEPROM.get(0+sizeof(ssidWifi)+sizeof(passwordWifi), serverName);
   char ok[2+1];
-  EEPROM.get(0+sizeof(ssidWifi)+sizeof(passwordWifi), ok);
+  EEPROM.get(0+sizeof(ssidWifi)+sizeof(passwordWifi)+sizeof(serverName), ok);
   EEPROM.end();
   if (String(ok) != String("OK")) {
     ssidWifi[0] = 0;
@@ -28,8 +29,9 @@ void saveCredentials(void) {
   EEPROM.begin(512);
   EEPROM.put(0, ssidWifi);
   EEPROM.put(0+sizeof(ssidWifi), passwordWifi);
+  EEPROM.put(0+sizeof(ssidWifi)+sizeof(passwordWifi), serverName);
   char ok[2+1] = "OK";
-  EEPROM.put(0+sizeof(ssidWifi)+sizeof(passwordWifi), ok);
+  EEPROM.put(0+sizeof(ssidWifi)+sizeof(passwordWifi)+sizeof(serverName), ok);
   EEPROM.commit();
   EEPROM.end();
 }
@@ -41,8 +43,9 @@ void saveCredentials(void) {
 */
 void localLoadCredentials(void) {
 unsigned i;
-    char *ssid = "GVT-34C0";
-    char* password = "xxxxxxxx";
+    char *ssid = "INVENTUS";
+    char* password = "xxxxxxxxxx";
+    char* server = "ambiente";
 
     for (i = 0; i < 8; i++){
         ssidWifi[i] = *(ssid + i);;
@@ -53,4 +56,9 @@ unsigned i;
         passwordWifi[i] = *(password + i);
     }   
     passwordWifi[i] = '\0'; 
+
+    for (i = 0; i<8; i++){
+        serverName[i] = *(server + i);
+    }   
+    serverName[i] = '\0'; 
 }

@@ -171,6 +171,8 @@ void handle_OnConnect() {
    s.replace("%HUMI%", String(Humidity));
 
    s.replace("%HORA%",getDiaHora());
+   s.replace("%SERVERNAME%",serverName);
+   s.replace("%MYIP%", WiFi.localIP().toString());
    
    switch (diaAtual){
      case 0:
@@ -253,7 +255,7 @@ void handle_getWifiData() {
 
 void handle_getfunction() {
  String message = "Number of args received:";
- String config_wifi_pw = Config_Wifi_PW_Page;    //The page to configure Wifi password
+ String config_server_name = Config_Server_Name_Page;//The page to configure server Name
  String wifiParameter = "wifiName";              //String received from webpage to indicate the type of the data
  String config_wifi_sucess = Config_Wifi_Sucess; //The sucess page
  String config_wifi_erro = Config_Wifi_Erro;     //The erro page
@@ -271,19 +273,23 @@ void handle_getfunction() {
 
  //if (wifiParameter.equals(server.argName(0)) ){      // wifiName
  if (server.argName(0) == "wifiName"){
-    server.send(200, "text/html", config_wifi_pw);
+    server.send(200, "text/html", config_server_name);
     String aux =  String(server.arg(0));
     aux.toCharArray(ssidWifi, aux.length() + 1);
     Serial.print("ssid: "); Serial.println(ssidWifi);
+
+    aux =  String(server.arg(1));
+    aux.toCharArray(passwordWifi, aux.length() + 1);
+    Serial.print("pw: "); Serial.println(passwordWifi);
     wifiParameter = "wifiPassword";                   //Reconfigure to next page
  }
  else{
     Serial.print("arg0 = ");
     Serial.println(server.argName(0));
-    if (server.argName(0) == "wifiPassword"){
+    if (server.argName(0) == "serverName"){
         String aux =  String(server.arg(0));
-        aux.toCharArray(passwordWifi, aux.length() + 1);
-        Serial.print("pw: "); Serial.println(passwordWifi);
+        aux.toCharArray(serverName, aux.length() + 1);
+        Serial.print("Endereço: "); Serial.println(serverName);
         saveCredentials();
         server.send(200, "text/html",config_wifi_sucess);
     }
@@ -389,9 +395,9 @@ void setup() {
   Serial.print("Connecting to ");
   Serial.print(ssidWifi); Serial.print(" "); Serial.println(passwordWifi); 
   Serial.println(ssidWifi);
-  WiFi.hostname("ambiente");
+  WiFi.hostname(serverName);
   WiFi.begin(ssidWifi, passwordWifi);
-  MDNS.begin("ambiente");
+  MDNS.begin(serverName);
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
