@@ -18,10 +18,11 @@ Table example:
 ![APP Responsive](doc/hardware.png)
 
 # APP 
-When the device start it looks for a known WiFi network and if it isn't avaiable a server will be opened. 
-The server name will be **ESP_Inventus** and the pass phrase is **inventus**.
-After connect in this server, you will be able to change the local network parameters. Once it is done with **sucess** restart your device. 
-You can connect in your device using the url **http://ambiente/** to see the main page (if it not work, restart your router).
+When the device start it looks for a known WiFi network and if it isn't avaiable a server will be opened at 192.168.4.1 adress. 
+The WiFi name will be **ESP_Inventus** and the pass phrase to acess it is **inventus**.
+After connect in this server, you will be able to configure the desired WiFi that the device will be connected and you can give a name to distinguish between two or more devices. This name can be the local where this device will be monitoring, for example, my_room. Once it is done with **sucess** restart your device. 
+You can connect in your device using the url **http://my_room/** to see the main page (if it not work, restart your router, too).
+Once it is configured is possible to reconfigure the network parameters and the name of the device through the  url **http://my_room/reconfig**.
 
 ![APP Responsive](doc/app.png)
 

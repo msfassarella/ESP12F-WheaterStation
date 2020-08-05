@@ -410,7 +410,8 @@ void setup() {
   Serial.println(WiFi.hostname());
 
   server.on("/", handle_OnConnect);
-
+  server.on("/reconfig", handle_getWifiData);
+  server.on("/get", HTTP_GET, handle_getfunction);
   server.onNotFound(handle_NotFound);
   server.begin();
   Serial.println("HTTP server started");

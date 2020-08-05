@@ -11,7 +11,7 @@ String Config_Wifi_Page = R"=====(
     <label>WiFi</label><br>
     <input type="text" name="wifiName"> <br>
     <label>PW</label><br>
-    <input type="text" name="wifiPW"><br>
+    <input type="password" name="wifiPW"><br>
     <p> <input type="Submit" value="Next"></p>
   </form><br>
 </body>
